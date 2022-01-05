@@ -1,7 +1,5 @@
 import random
 
-print("hello")
-
 
 class Connection:
     def __init__(self, node_from, node_to, weight, innovation_num):
@@ -26,4 +24,3 @@ class Connection:
         clone_connection = self.__init__(self.node_from, self.node_to, self.weight, self.innovation_num)
         clone_connection.enabled = self.enabled
         return clone_connection
-
