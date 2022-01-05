@@ -1,5 +1,8 @@
 import random
 from Node import Node
+import Template
+from ConnectionHistory import ConnectionHistory
+from Connection import Connection
 
 
 class Genome:
@@ -50,9 +53,12 @@ class Genome:
             from_index = int(random.uniform(0, len(self.nodes)))
             to_index = int(random.uniform(0, len(self.nodes)))
 
-        # connection_innov_num = not complete
+        from_node = self.genes[from_index]
+        to_node = self.genes[to_index]
 
-
+        connection_innov_num = self.get_innov_num(innovation_history_list, from_node, to_node)
+        self.genes.append(Connection(from_node, to_node, random.uniform(-1, 1), connection_innov_num))  # may error
+        self.connect_nodes()
 
     def connections_full(self):
         max = 0
@@ -62,7 +68,7 @@ class Genome:
 
         for i in range(self.layers_num - 1):
             nodes_in_next = 0
-            for j in range (i + 1, self.layers_num):
+            for j in range(i + 1, self.layers_num):
                 nodes_in_next += node_count_per_layer[j]
 
             max += nodes_in_next * node_count_per_layer[i]
@@ -70,14 +76,31 @@ class Genome:
         return max == len(self.genes)
 
     def cannot_connect(self, to_index, from_index):
-        if self.nodes[to_index].layer <= self.nodes[from_index].layer: return True # if same layer or to is behind from
+        if self.nodes[to_index].layer <= self.nodes[from_index].layer: return True  # if same layer or to is behind from
         # Finish for if the nodes are already connected! Dependency: isConnectedTo in Node class
         return False
 
-    def getInnovNum(self, innovation_history_list, from_node, to_node):
+    # innovation_history_list is a list of ConnectionHistories
+    def get_innov_num(self, innovation_history_list, from_node, to_node):
         is_new = True
-        connection_innov_num = 0 # check the template bc this is some bullshit -- what is nextConnectionNo?
-        next_connection_num = 0
-        
-        #for i in range(len(innovation_history_list)):
-            # if (innovation_history_list[i].) # must implement matches dependencies in connectionHistory
+        connection_innov_num = Template.next_connection_num
+
+        for i in range(len(innovation_history_list)):
+            if innovation_history_list[i].equals(self, from_node, to_node):
+                is_new = False
+                connection_innov_num = innovation_history_list[i].innov_num
+                break
+
+        if is_new:
+            self.update_innovation_history_list(innovation_history_list, from_node, to_node, connection_innov_num)
+            Template.next_connection_num += 1
+
+        return connection_innov_num
+
+    def update_innovation_history_list(self, innovation_history_list, from_node, to_node, connection_innov_num):
+        current_innov_nums = []
+        for i in range(len(self.genes)):
+            current_innov_nums.append(self.genes[i].innovation_num)
+
+        innovation_history_list.append(
+            ConnectionHistory(from_node.id, to_node.id, connection_innov_num, current_innov_nums))
