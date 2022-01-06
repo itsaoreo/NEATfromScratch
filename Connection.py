@@ -2,9 +2,9 @@ import random
 
 
 class Connection:
-    def __init__(self, from_node, to_node, weight, innovation_num):
-        self.from_node = from_node
+    def __init__(self, to_node, from_node, weight, innovation_num):
         self.to_node = to_node
+        self.from_node = from_node
         self.weight = weight
         self.innovation_num = innovation_num
         self.enabled = True

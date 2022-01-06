@@ -15,6 +15,9 @@ class Node:
     def engage():
         if Self.layer == 0:
             output_value = Node.sigmoid(Node.pre_actication_sum)
+        for i in range (len(Self.output_connections)):
+            if (Self.output_connections[i].enabled):
+                Self.output_connections[i].to_node.pre_activation_sum += Self.output_connections[i].weight * Self.output_value
         
 
     def copy(self):
@@ -28,11 +31,11 @@ class Node:
 
         if Self.layer > other.layer:    
             for i in range (len(other.output_connections)):
-                if other.output_connections[i].to_node_id == Self:
+                if other.output_connections[i].to_node == Self:
                     return True
-        elif  other.Selflayer > Self.layer:
+        elif  other.layer > Self.layer:
             for i in range (len(Self.output_connections)):
-                if Self.output_conections[i].to_node_id == other:
+                if Self.output_conections[i].to_node == other:
                     return True
         
         return False
