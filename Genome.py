@@ -61,7 +61,7 @@ class Genome:
         self.connect_nodes()
 
     def connections_full(self):
-        max = 0
+        max_possible = 0
         node_count_per_layer = []
         for i in range(len(self.nodes)):
             node_count_per_layer[self.nodes[i].layer] += 1
@@ -71,12 +71,13 @@ class Genome:
             for j in range(i + 1, self.layers_num):
                 nodes_in_next += node_count_per_layer[j]
 
-            max += nodes_in_next * node_count_per_layer[i]
+            max_possible += nodes_in_next * node_count_per_layer[i]
 
-        return max == len(self.genes)
+        return max_possible == len(self.genes)
 
     def cannot_connect(self, to_index, from_index):
-        if self.nodes[to_index].layer <= self.nodes[from_index].layer: return True  # if same layer or to is behind from
+        if self.nodes[to_index].layer <= self.nodes[from_index].layer:
+            return True  # if same layer or to is behind from
         # Finish for if the nodes are already connected! Dependency: isConnectedTo in Node class
         return False
 
