@@ -1,4 +1,7 @@
+from _typeshed import Self
 import random
+
+from numpy import bitwise_and
 from Node import Node
 from EvolutionStep import EvolutionStep
 from Connection import Connection
@@ -34,6 +37,68 @@ class Genome:
         self.next_node_num += 1
         bias.layer = 0
         self.nodes.append(bias)
+        
+        
+    # mutation method 1. Add node to the nueral net
+    def add_node(innovation_history_list):
+        #if no connections exist, create one 
+        if len(Self.genes) == 0:
+            Self.add_connection(Self, innovation_history_list)
+            return
+        # 
+        randomConnectionIndex = int(random.uniform(0, len(Self.genes)))
+        
+        #cant remove bias node - check and re randomize if case
+        while(Self.genes[randomConnectionIndex].from_node.id == Self.bias):
+            randomConnectionIndex = int(random.uniform(0, len(Self.genes)))
+        
+        Self.genes[randomConnectionIndex].enabled = False
+        
+        newNodeNumber = Self.next_node_num
+        Self.nodes.append(Node(newNodeNumber))
+        Self.next_node_num += 1
+        
+        # for connection bw a to b 
+        connectionInnovationNumber = Self.get_innov_num(Self, innovation_history_list,
+                                                    Self.genes[randomConnectionIndex].from_node,
+                                                    Self.get_node(newNodeNumber))
+        Self.genes.append(Connection(Self.genes[randomConnectionIndex].from_node, Self.get_node(newNodeNumber), 1, connectionInnovationNumber))
+        
+        # for connection bw b to c
+        connectionInnovationNumber = Self.get_innov_num(Self, innovation_history_list, 
+                                                        Self.get_node(newNodeNumber), 
+                                                        Self.genes[randomConnectionIndex].to_node)
+        Self.genes.append(Connection(Self.get_node(newNodeNumber), 
+                                     Self.genes[randomConnectionIndex].to_node, 
+                                     Self.genes[randomConnectionIndex].weight,
+                                     connectionInnovationNumber))
+        Self.get_node(newNodeNumber).layer = Self.genes[randomConnectionIndex].from_node.layer + 1
+        
+        #get innovation number for bias connection
+        connectionInnovationNumber = Self.get_innov_num(Self, innovation_history_list, 
+                                                        Self.get_node(Self.bias_node), 
+                                                        Self.get_node(newNodeNumber))
+        # insert connection to bias node 
+        Self.genes.append(Connection(Self.get_node(Self.bias_node), Self.get_node(newNodeNumber), 
+                                     0, connectionInnovationNumber))
+        
+        
+        if Self.get_node(newNodeNumber).layer == Self.genes[randomConnectionIndex].to_node.layer:
+            for i in range (len(Self.nodes) - 1):
+                if Self.nodes[i].layer >= Self.get_node(newNodeNumber):
+                    Self.nodes[i].layer += 1
+            Self.layers += 1
+
+        Self.connect_nodes()
+        return
+    # return the node pos with the matching ID or returns none
+    def get_node(searchID):
+        for i in len(Self.nodes):
+            if Self.nodes[i].id == searchID:
+                return Self.nodes[i]
+        return None
+                
+        
 
     def connect_nodes(self):
 
