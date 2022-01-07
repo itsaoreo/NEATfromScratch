@@ -15,7 +15,7 @@ class Node:
 
     def engage(self):
         if self.layer == 0:
-            output_value = self.sigmoid(self.pre_activation_sum)
+            self.output_value = self.sigmoid(self.pre_activation_sum)
         for i in range(len(self.output_connections)):
             if self.output_connections[i].enabled:
                 self.output_connections[i].to_node.pre_activation_sum += self.output_connections[
