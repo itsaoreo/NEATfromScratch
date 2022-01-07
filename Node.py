@@ -22,7 +22,8 @@ class Node:
                                                                              i].weight * self.output_value
 
     def copy(self):
-        copy_node = Node.__init__(self, self.id)
+        copy_node = Node.__init__(self, self.id) # todo: deep copy outputConnections?
+        copy_node.output_connections = self.output_connections
         return copy_node
 
     def is_connected(self, other):
