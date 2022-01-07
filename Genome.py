@@ -145,7 +145,8 @@ class Genome:
     def cannot_connect(self, to_index, from_index):
         if self.nodes[to_index].layer <= self.nodes[from_index].layer:
             return True  # if same layer or to is behind from
-        # Finish for if the nodes are already connected! Dependency: isConnectedTo in Node class
+        if self.nodes[from_index].is_connected(self.nodes[to_index]):
+            return True
         return False
 
     def get_innov_num(self, from_node, to_node):
