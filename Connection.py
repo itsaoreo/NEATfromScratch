@@ -20,7 +20,7 @@ class Connection:
             elif self.weight < -1:
                 self.weight = -1
 
-    def clone(self):
+    def copy(self): # todo: Deep copy the to and from nodes?
         clone_connection = self.__init__(self.from_node, self.to_node, self.weight, self.innovation_num)
         clone_connection.enabled = self.enabled
         return clone_connection
