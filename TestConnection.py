@@ -24,7 +24,7 @@ class MyTestCase(unittest.TestCase):
         self.assertNotEqual(con_copy, con_test)
         self.assertEqual(con_copy.weight, con_test.weight)
         self.assertEqual(con_copy.to_node, con_test.to_node)
-        self.assertNotEqual(con_copy.from_node, con_test.from_node)
+        self.assertNotEqual(con_copy.from_node, con_test.to_node)
         self.assertEqual(con_copy.to_node.id, con_test.to_node.id)
         self.assertEqual(con_copy.from_node.id, con_test.from_node.id)
 
