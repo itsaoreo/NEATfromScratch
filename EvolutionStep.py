@@ -1,4 +1,4 @@
-class ConnectionHistory:
+class EvolutionStep:
 
     def __init__(self, from_node_id, to_node_id, innov_num, innov_num_list):
         self.from_node_id = from_node_id

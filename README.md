@@ -1,5 +1,7 @@
 # NEAT - NeuroEvolution of Augmenting Topologies
-Arya Goel - University of Illinois At Urbana-Champaign 
+Arya Goel - University of Illinois At Urbana-Champaign  
 David Zhi LuoZhang - Wharton & Penn Engineering
 
-This project marks our foray into deep learning, below, we detail our implmentation of the NEAT Algorithm implmented from scratch in python for use in various applications. We demonstrate the algorithms use on Pacman
+This project marks our foray into deep learning. Below, we detail our implementation of the NEAT Algorithm
+from scratch in Python. We demonstrate the algorithm via a Pac-Man AI, and we provide an easy-to-use interface to use 
+the algorithm in various applications.
