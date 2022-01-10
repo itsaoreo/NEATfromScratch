@@ -41,56 +41,56 @@ class Genome:
         self.nodes.append(bias)
 
     # mutation method 1. Add node to the nueral net
-    def add_node(innovation_history_list):
+    def add_node(self, innovation_history_list):
         # if no connections exist, create one
-        if len(Self.genes) == 0:
-            Self.add_connection(Self, innovation_history_list)
+        if len(self.genes) == 0:
+            self.add_connection(innovation_history_list)
             return
         # 
-        randomConnectionIndex = int(random.uniform(0, len(Self.genes)))
+        randomConnectionIndex = int(random.uniform(0, len(self.genes)))
 
         # cant remove bias node - check and re randomize if case
-        while (Self.genes[randomConnectionIndex].from_node.id == Self.bias):
-            randomConnectionIndex = int(random.uniform(0, len(Self.genes)))
+        while (self.genes[randomConnectionIndex].from_node.id == self.bias):
+            randomConnectionIndex = int(random.uniform(0, len(self.genes)))
 
-        Self.genes[randomConnectionIndex].enabled = False
+        self.genes[randomConnectionIndex].enabled = False
 
-        newNodeNumber = Self.next_node_num
-        Self.nodes.append(Node(newNodeNumber))
-        Self.next_node_num += 1
+        newNodeNumber = self.next_node_num
+        self.nodes.append(Node(newNodeNumber))
+        self.next_node_num += 1
 
         # for connection bw a to b 
-        connectionInnovationNumber = Self.get_innov_num(Self, innovation_history_list,
-                                                        Self.genes[randomConnectionIndex].from_node,
-                                                        Self.get_node(newNodeNumber))
-        Self.genes.append(Connection(Self.genes[randomConnectionIndex].from_node, Self.get_node(newNodeNumber), 1,
+        connectionInnovationNumber = self.get_innov_num(self, innovation_history_list,
+                                                        self.genes[randomConnectionIndex].from_node,
+                                                        self.get_node(newNodeNumber))
+        self.genes.append(Connection(self.genes[randomConnectionIndex].from_node, self.get_node(newNodeNumber), 1,
                                      connectionInnovationNumber))
 
         # for connection bw b to c
-        connectionInnovationNumber = Self.get_innov_num(Self, innovation_history_list,
-                                                        Self.get_node(newNodeNumber),
-                                                        Self.genes[randomConnectionIndex].to_node)
-        Self.genes.append(Connection(Self.get_node(newNodeNumber),
-                                     Self.genes[randomConnectionIndex].to_node,
-                                     Self.genes[randomConnectionIndex].weight,
+        connectionInnovationNumber = self.get_innov_num(self, innovation_history_list,
+                                                        self.get_node(newNodeNumber),
+                                                        self.genes[randomConnectionIndex].to_node)
+        self.genes.append(Connection(self.get_node(newNodeNumber),
+                                     self.genes[randomConnectionIndex].to_node,
+                                     self.genes[randomConnectionIndex].weight,
                                      connectionInnovationNumber))
-        Self.get_node(newNodeNumber).layer = Self.genes[randomConnectionIndex].from_node.layer + 1
+        self.get_node(newNodeNumber).layer = self.genes[randomConnectionIndex].from_node.layer + 1
 
         # get innovation number for bias connection
-        connectionInnovationNumber = Self.get_innov_num(Self, innovation_history_list,
-                                                        Self.get_node(Self.bias_node),
-                                                        Self.get_node(newNodeNumber))
+        connectionInnovationNumber = self.get_innov_num(self, innovation_history_list,
+                                                        self.get_node(self.bias_node),
+                                                        self.get_node(newNodeNumber))
         # insert connection to bias node 
-        Self.genes.append(Connection(Self.get_node(Self.bias_node), Self.get_node(newNodeNumber),
+        self.genes.append(Connection(self.get_node(self.bias_node), self.get_node(newNodeNumber),
                                      0, connectionInnovationNumber))
 
-        if Self.get_node(newNodeNumber).layer == Self.genes[randomConnectionIndex].to_node.layer:
-            for i in range(len(Self.nodes) - 1):
-                if Self.nodes[i].layer >= Self.get_node(newNodeNumber):
-                    Self.nodes[i].layer += 1
-            Self.layers += 1
+        if self.get_node(newNodeNumber).layer == self.genes[randomConnectionIndex].to_node.layer:
+            for i in range(len(self.nodes) - 1):
+                if self.nodes[i].layer >= self.get_node(newNodeNumber):
+                    self.nodes[i].layer += 1
+            self.layers += 1
 
-        Self.connect_nodes()
+        self.connect_nodes()
         return
 
     # todo: Arya pls see this
@@ -98,10 +98,10 @@ class Genome:
     # todo: eg. Self.nodes -> self.nodes I deleted the import _typeShed Self so the errors aren't hidden
     # todo: also u need to use range(len(...)) bc range converts int to iterable
     # return the node pos with the matching ID or returns none
-    def get_node(searchID):
-        for i in len(Self.nodes):
-            if Self.nodes[i].id == searchID:
-                return Self.nodes[i]
+    def get_node(self, searchID):
+        for i in len(self.nodes):
+            if self.nodes[i].id == searchID:
+                return self.nodes[i]
         return None
 
     # Connects nodes by loading up each node's output_connections list
