@@ -13,11 +13,12 @@ class Genome:
         self.outputs_num = outputs_num
         self.layers_num = 2
         self.next_node_num = 0
-        self.bias_node = 0  # initialize bias at 0
+        self.bias_val = 0  # initialize bias at 0
+        # self.bias_node = Node(-1) # -1 because uninitialized
         self.nodes = []  # list of nodes
         self.genes = []  # list of connections
         self.network_ordered = []  # list of nodes, ordered by layer for how the NN feeds forward through them
-        self.evolution_history = []  # list of EvolutionStep objects that shows how the unique genome structure
+        # self.evolution_history = []  # list of EvolutionStep objects that shows how the unique genome structure
         # has evolved over time
 
         # initialize input nodes
@@ -35,22 +36,22 @@ class Genome:
             self.nodes.append(new_output)
 
         # initialize bias node
-        bias = Node(self.next_node_num)
+        self.bias_node = Node(self.next_node_num)
         self.next_node_num += 1
-        bias.layer = 0
-        self.nodes.append(bias)
+        self.bias_node.layer = 0
+        self.nodes.append(self.bias_node)
 
     # mutation method 1. Add node to the nueral net
-    def add_node(self, innovation_history_list):
+    def add_node(self, evolution_history):
         # if no connections exist, create one
         if len(self.genes) == 0:
-            self.add_connection(innovation_history_list)
+            self.add_connection(evolution_history)
             return
         # 
         randomConnectionIndex = int(random.uniform(0, len(self.genes)))
 
         # cant remove bias node - check and re randomize if case
-        while (self.genes[randomConnectionIndex].from_node.id == self.bias):
+        while (self.genes[randomConnectionIndex].from_node.id == self.bias_node.id):
             randomConnectionIndex = int(random.uniform(0, len(self.genes)))
 
         self.genes[randomConnectionIndex].enabled = False
@@ -60,14 +61,14 @@ class Genome:
         self.next_node_num += 1
 
         # for connection bw a to b 
-        connectionInnovationNumber = self.get_innov_num(self, innovation_history_list,
+        connectionInnovationNumber = self.get_innov_num(evolution_history,
                                                         self.genes[randomConnectionIndex].from_node,
                                                         self.get_node(newNodeNumber))
         self.genes.append(Connection(self.genes[randomConnectionIndex].from_node, self.get_node(newNodeNumber), 1,
                                      connectionInnovationNumber))
 
         # for connection bw b to c
-        connectionInnovationNumber = self.get_innov_num(self, innovation_history_list,
+        connectionInnovationNumber = self.get_innov_num(evolution_history,
                                                         self.get_node(newNodeNumber),
                                                         self.genes[randomConnectionIndex].to_node)
         self.genes.append(Connection(self.get_node(newNodeNumber),
@@ -77,7 +78,7 @@ class Genome:
         self.get_node(newNodeNumber).layer = self.genes[randomConnectionIndex].from_node.layer + 1
 
         # get innovation number for bias connection
-        connectionInnovationNumber = self.get_innov_num(self, innovation_history_list,
+        connectionInnovationNumber = self.get_innov_num(evolution_history,
                                                         self.get_node(self.bias_node),
                                                         self.get_node(newNodeNumber))
         # insert connection to bias node 
@@ -179,29 +180,29 @@ class Genome:
         return False
 
     # Gets an innovation number for the resultant genome of a mutation
-    def get_innov_num(self, from_node, to_node):
+    def get_innov_num(self, evolution_history, from_node, to_node):
         is_new = True
-        connection_innovation_num = next_connection_num
+        connection_innovation_num = Genome.next_connection_num
 
         # If the genome has been generated before, then use the innovation number of that earlier evolution
-        for i in range(len(self.evolution_history)):
-            if self.evolution_history[i].equals(self, from_node, to_node):
+        for i in range(len(evolution_history)):
+            if evolution_history[i].equals(self, from_node, to_node):
                 is_new = False
-                connection_innovation_num = self.evolution_history[i].innovation_num
+                connection_innovation_num = evolution_history[i].innovation_num
                 break
 
         # If it's a new genome, record this new evolution and give it the next innovation number.
         if is_new:
-            self.record_new_evolution(from_node.id, to_node.id, connection_innovation_num)
-            next_connection_num += 1
+            self.record_new_evolution(evolution_history, from_node.id, to_node.id, connection_innovation_num)
+            Genome.next_connection_num += 1
 
         return connection_innovation_num
 
     # Records a new evolution as an EvolutionStep object added to a passed in list of all evolved genomes
-    def record_new_evolution(self, from_node_id, to_node_id, connection_innov_num):
+    def record_new_evolution(self, evolution_history, from_node_id, to_node_id, connection_innov_num):
         innovation_num_list = []
         # Record all the existing EvolutionSteps up to this point, not counting
         for i in range(len(self.genes)):
             innovation_num_list.append(self.genes[i].innovation_num)
         new_evolution = EvolutionStep(from_node_id, to_node_id, connection_innov_num, innovation_num_list)
-        self.evolution_history.append(new_evolution)
+        evolution_history.append(new_evolution)
