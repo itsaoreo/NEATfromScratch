@@ -99,7 +99,7 @@ class Genome:
     # todo: also u need to use range(len(...)) bc range converts int to iterable
     # return the node pos with the matching ID or returns none
     def get_node(self, searchID):
-        for i in len(self.nodes):
+        for i in range(len(self.nodes)):
             if self.nodes[i].id == searchID:
                 return self.nodes[i]
         return None
