@@ -5,15 +5,15 @@ from Node import Node
 from EvolutionStep import EvolutionStep
 from Connection import Connection
 
-
 class Genome:
+    next_connection_num = 0  # initialize connection numbers at 0
+
     def __init__(self, inputs_num, outputs_num):
         self.inputs_num = inputs_num
         self.outputs_num = outputs_num
         self.layers_num = 2
         self.next_node_num = 0
         self.bias_node = 0  # initialize bias at 0
-        self.next_connection_num = 0  # initialize connection numbers at 0
         self.nodes = []  # list of nodes
         self.genes = []  # list of connections
         self.network_ordered = []  # list of nodes, ordered by layer for how the NN feeds forward through them
@@ -181,7 +181,7 @@ class Genome:
     # Gets an innovation number for the resultant genome of a mutation
     def get_innov_num(self, from_node, to_node):
         is_new = True
-        connection_innovation_num = self.next_connection_num
+        connection_innovation_num = next_connection_num
 
         # If the genome has been generated before, then use the innovation number of that earlier evolution
         for i in range(len(self.evolution_history)):
@@ -193,7 +193,7 @@ class Genome:
         # If it's a new genome, record this new evolution and give it the next innovation number.
         if is_new:
             self.record_new_evolution(from_node.id, to_node.id, connection_innovation_num)
-            self.next_connection_num += 1
+            next_connection_num += 1
 
         return connection_innovation_num
 
