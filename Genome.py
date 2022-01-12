@@ -1,6 +1,8 @@
 import random
 
 from numpy import bitwise_and
+
+import Interface
 from Node import Node
 from EvolutionStep import EvolutionStep
 from Connection import Connection
@@ -89,7 +91,7 @@ class Genome:
             for i in range(len(self.nodes) - 1):
                 if self.nodes[i].layer >= self.get_node(newNodeNumber):
                     self.nodes[i].layer += 1
-            self.layers += 1
+            self.layers_num += 1
 
         self.connect_nodes()
         return
@@ -118,7 +120,7 @@ class Genome:
             self.genes[i].node_from.output_connections.append(self.genes[i])
 
     # Mutation method #2: Generate a random connection
-    def add_connection(self, innovation_history_list):
+    def add_connection(self, evolution_history):
         # Check if the neural net is full ie no new connections can be added
         if self.is_full():
             print("Network full. Add connection failed.")
@@ -138,7 +140,7 @@ class Genome:
         to_node = self.genes[to_index]
 
         # Get the innovation number for this mutation
-        connection_innov_num = self.get_innov_num(from_node, to_node)
+        connection_innov_num = self.get_innov_num(evolution_history, from_node, to_node)
         # Add this connection with a random weight and the innovation number to the list of connections
         self.genes.append(Connection(from_node, to_node, random.uniform(-1, 1), connection_innov_num))
         # Connect nodes
@@ -206,3 +208,39 @@ class Genome:
             innovation_num_list.append(self.genes[i].innovation_num)
         new_evolution = EvolutionStep(from_node_id, to_node_id, connection_innov_num, innovation_num_list)
         evolution_history.append(new_evolution)
+
+    # represent network as a list of nodes waiting to be activated
+    def generate_network(self):
+        self.connect_nodes()
+        network = []
+
+        # for each layer, go through all nodes and add the nodes that are in that layer
+        for i in range(self.layers_num):
+            for j in range(len(self.nodes)):
+                if self.nodes[i].layer == i:
+                    network.append(self.nodes[i])
+
+    # mutates the genome according to probabilities set in the interface
+    def mutate(self, evolution_history):
+
+        # if the genome has yet to evolve any connections, add one
+        if len(self.genes) == 0:
+            self.add_connection(evolution_history)
+
+        # probabilistically mutate the weight of every connection
+        weight_rand = random.uniform(0, 1)
+        if weight_rand < Interface.weight_mutation_probability:
+            for i in range(len(self.genes)):
+                self.genes[i].mutate_weight()
+
+        # probabilistically add a new connection
+        connection_rand = random.uniform(0, 1)
+        if connection_rand < Interface.connection_mutation_probability:
+            self.add_connection(evolution_history)
+
+        # probabilistically add a new node
+        node_rand = random.uniform(0, 1)
+        if node_rand < Interface.node_mutation_probability:
+            self.add_node(evolution_history)
+
+
