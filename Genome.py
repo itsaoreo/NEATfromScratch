@@ -1,6 +1,8 @@
 import random
 
 from numpy import bitwise_and
+
+import Interface
 from Node import Node
 from EvolutionStep import EvolutionStep
 from Connection import Connection
@@ -217,3 +219,28 @@ class Genome:
             for j in range(len(self.nodes)):
                 if self.nodes[i].layer == i:
                     network.append(self.nodes[i])
+
+    # mutates the genome according to probabilities set in the interface
+    def mutate(self, evolution_history):
+
+        # if the genome has yet to evolve any connections, add one
+        if len(self.genes) == 0:
+            self.add_connection(evolution_history)
+
+        # probabilistically mutate the weight of every connection
+        weight_rand = random.uniform(0, 1)
+        if weight_rand < Interface.weight_mutation_probability:
+            for i in range(len(self.genes)):
+                self.genes[i].mutate_weight()
+
+        # probabilistically add a new connection
+        connection_rand = random.uniform(0, 1)
+        if connection_rand < Interface.connection_mutation_probability:
+            self.add_connection(evolution_history)
+
+        # probabilistically add a new node
+        node_rand = random.uniform(0, 1)
+        if node_rand < Interface.node_mutation_probability:
+            self.add_node(evolution_history)
+
+
