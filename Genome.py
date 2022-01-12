@@ -243,4 +243,10 @@ class Genome:
         if node_rand < Interface.node_mutation_probability:
             self.add_node(evolution_history)
 
-
+    # Used in crossing over to see if the other genome has a connection matching the innovation number
+    # Returns the matching gene if found, otherwise None if not found
+    def same_gene(self, other_genome, innov_num):
+        for i in range(len(other_genome.genes)):
+            if other_genome.genes[i].innovation_num == innov_num:
+                return other_genome.genes[i]
+        return None
